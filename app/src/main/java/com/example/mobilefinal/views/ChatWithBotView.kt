@@ -1,6 +1,5 @@
 package com.example.mobilefinal.views
 
-import android.app.Activity
 import androidx.compose.foundation.layout.Column
 import androidx.compose.material.OutlinedButton
 import androidx.compose.material.Text
@@ -20,12 +19,15 @@ fun ChatWithBotView(navController: NavHostController) {
     val chatVM = viewModel<ChatViewModel>(LocalContext.current as ViewModelStoreOwner)
     val userVM = viewModel<UserViewModel>(LocalContext.current as ViewModelStoreOwner)
     chatVM.currentPartner.value = BOT
-    ConversationView()
-    // init a conv if not
-    OutlinedButton(onClick = {
-        chatVM.deleteWithBotConversation(userVM.loggedInUser.value.id)
-        navController.navigateUp()
-    }) {
-        Text(text = "Delete this conversation")
+    Column {
+        OutlinedButton(onClick = {
+            chatVM.deleteWithBotConversation(userVM.loggedInUser.value.id, navController)
+        }) {
+            Text(text = "Delete this conversation")
+        }
+        ConversationView()
+    }
+    if (chatVM.chats.size == 0){
+        chatVM.sendMessage(BOT.id, userVM.loggedInUser.value.id, "Hi, let's start a chat!")
     }
 }

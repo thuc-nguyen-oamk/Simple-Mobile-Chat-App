@@ -1,12 +1,12 @@
 package com.example.mobilefinal.views
 
-import android.content.res.Resources
-import android.util.DisplayMetrics
-import android.util.Log
-import android.util.TypedValue
 import androidx.compose.foundation.*
+import androidx.compose.foundation.gestures.animateScrollBy
 import androidx.compose.foundation.layout.*
-import androidx.compose.material.*
+import androidx.compose.material.Card
+import androidx.compose.material.Icon
+import androidx.compose.material.Text
+import androidx.compose.material.TextButton
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Alignment.Companion.CenterHorizontally
@@ -15,8 +15,8 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import androidx.lifecycle.ViewModelStoreOwner
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
@@ -25,13 +25,14 @@ import com.example.mobilefinal.R
 import com.example.mobilefinal.models.ChatViewModel
 import com.example.mobilefinal.models.User
 import com.example.mobilefinal.models.UserViewModel
+import kotlinx.coroutines.launch
 import java.util.*
 
 
 @Composable
 fun ChatView(navController: NavHostController) {
-    var filteredPartners = listOf<User>()
-    var filteringText = remember { mutableStateOf("") }
+    val filteredPartners: List<User>
+    val filteringText = remember { mutableStateOf("") }
 
     val userVM = viewModel<UserViewModel>(LocalContext.current as ViewModelStoreOwner)
 
@@ -48,7 +49,6 @@ fun ChatView(navController: NavHostController) {
     Box(
         modifier = Modifier
             .fillMaxSize()
-            .background(Color.Red)
     ) {
         UserListView(filteredPartners, filteringText, navController)
     }
@@ -58,12 +58,12 @@ fun ChatView(navController: NavHostController) {
 
 @Composable
 fun SearchBox(filteringText: MutableState<String>) {
-    OutlinedTextField(
-        value = filteringText.value,
-        onValueChange = { filteringText.value = it },
-        label = { Text(text = "Search for a nickname...") })
+//    OutlinedTextField(
+//        value = filteringText.value,
+//        onValueChange = { filteringText.value = it },
+//        label = { Text(text = "Search for a nickname...") })
+    MyOutlineTextField(text = filteringText, label = "Search for a nickname...", isPw = false)
 }
-
 
 @Composable
 fun UserListView(
@@ -77,12 +77,13 @@ fun UserListView(
     Column(
         modifier = Modifier
             .fillMaxWidth()
+            .background(Color(0xff252552))
             .padding(horizontal = 40.dp, vertical = 10.dp)
             .verticalScroll(state = ScrollState(0), enabled = true),
         horizontalAlignment = CenterHorizontally,
 
         ) {
-        Text("User List (tap one to chat)", fontWeight = FontWeight(900))
+        Text("User List (tap one to chat)", fontWeight = FontWeight(700), color = Color(0xfff8e3d8))
         SearchBox(filteringText = filteringText)
         Spacer(modifier = Modifier.height(20.dp))
 
@@ -111,30 +112,37 @@ fun UserListView(
 
 }
 
-
 @Composable
 fun ConversationView() {
-    var text = remember { mutableStateOf("") }
+    val text = remember { mutableStateOf("") }
     val userVM = viewModel<UserViewModel>(LocalContext.current as ViewModelStoreOwner)
     val chatVM = viewModel<ChatViewModel>(LocalContext.current as ViewModelStoreOwner)
+    val coroutineScope = rememberCoroutineScope()
+    val scrollState = rememberScrollState()
+
+    fun scrollToNewMessage() {
+        coroutineScope.launch {
+            scrollState.animateScrollBy(250f)
+        }
+
+    }
+
     chatVM.fetchMessages(userVM.loggedInUser.value.id)
+    scrollToNewMessage()
 
     Column(
         modifier = Modifier
             .fillMaxSize()
+            .background(Color(0xffdf4e6b))
             .padding(10.dp),
         verticalArrangement = Arrangement.SpaceBetween
     ) {
         Column(
             modifier = Modifier
                 .fillMaxSize()
-                .verticalScroll(rememberScrollState())
+                .verticalScroll(scrollState)
                 .weight(1f, false)
         ) {
-            // fet msg of log user (sorted). Done
-            // filter by partner id (bc 1 user have conv w many) and show
-
-
             chatVM.chats.forEach {
                 val isMyMessage = it.senderId == userVM.loggedInUser.value.id
 
@@ -143,28 +151,35 @@ fun ConversationView() {
                         modifier = Modifier.fillMaxWidth(),
                         horizontalArrangement = if (isMyMessage) Arrangement.End else Arrangement.Start
                     ) {
+                        Column {
+                            if (it.senderId != userVM.loggedInUser.value.id) {
+                                Text(
+                                    text = chatVM.currentPartner.value.nickname,
+                                    fontSize = 10.sp,
+                                    modifier = Modifier.padding(horizontal = 20.dp)
+                                )
+                            }
+                            Card(
+                                elevation = 10.dp,
+                                backgroundColor = if (isMyMessage) Color.Blue else Color.Gray,
+                                modifier = Modifier
+                                    .padding(horizontal = 20.dp, vertical = 5.dp)
 
-                        Card(
-                            elevation = 10.dp,
-                            backgroundColor = if (isMyMessage) Color.Blue else Color.Gray,
-                            modifier = Modifier
-                                .padding(horizontal = 20.dp, vertical = 10.dp)
+                            ) {
 
-                        ) {
-                            Text(
-                                text = it.text,
-                                modifier = Modifier.padding(10.dp),
-                                color = Color.White
-                            )
+                                Text(
+                                    text = it.text,
+                                    modifier = Modifier.padding(10.dp),
+                                    color = Color.White
+                                )
+                            }
                         }
                     }
                 }
             }
 
         }
-//        val logicalDensity  = Resources.getSystem().displayMetrics.density
-//        val screenWidthPx  = Resources.getSystem().displayMetrics.widthPixels
-//        val screenWidthDp = logicalDensity/screenWidthPx
+
         Row(
             modifier = Modifier
                 .fillMaxWidth(),
@@ -172,26 +187,15 @@ fun ConversationView() {
             verticalAlignment = Alignment.CenterVertically
         ) {
             MyOutlineTextField(text = text, label = "Type a message...", isPw = false)
-//            OutlinedTextField(value = text.value, onValueChange = { text.value = it }, label = {
-//                Text(
-//                    text = "Type a message..."
-//                )
-//            }, modifier = Modifier.width(Dp(screenWidthDp-50)))
-
-
-
             Icon(
-                tint = Color(R.color.primary_variant),
+                tint = Color.Blue,
                 painter = painterResource(id = R.drawable.ic_send),
                 contentDescription = "send a message",
                 modifier = Modifier
                     .width(50.dp)
-//                    .weight(1f, true)
                     .clickable {
                         handleSendButton(chatVM, userVM, text)
                     })
-
-
         }
     }
 }
@@ -202,9 +206,5 @@ fun handleSendButton(chatVM: ChatViewModel, userVM: UserViewModel, text: Mutable
         chatVM.currentPartner.value.id,
         text.value
     )
-
-
     text.value = ""
-
 }
-

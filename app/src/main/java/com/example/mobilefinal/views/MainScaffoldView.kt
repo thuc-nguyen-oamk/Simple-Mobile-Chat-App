@@ -14,6 +14,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontFamily
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.ViewModelStoreOwner
 import androidx.lifecycle.viewmodel.compose.viewModel
@@ -37,10 +38,10 @@ fun MainScaffoldView() {
     Scaffold(
         topBar = { TopBar(userVM) },
         bottomBar = { BottomBar(navController) },
-        ){
-            Box(modifier = Modifier.padding(it)) {
-                MainContent(navController)
-            }
+    ) {
+        Box(modifier = Modifier.padding(it)) {
+            MainContent(navController)
+        }
     }
 }
 
@@ -55,8 +56,8 @@ fun TopBar(userVM: UserViewModel) {
             .padding(5.dp)
 
     ) {
-        Text(text = userVM.loggedInUser.value.nickname)
-        Text(text = APP_NAME, fontFamily = FontFamily.Monospace, color = Color(R.color.secondary))
+        Text(text = userVM.loggedInUser.value.nickname, color = Color(0xfff8e3d8))
+        Text(text = APP_NAME, fontFamily = FontFamily.Monospace, color = Color(0xfff8e3d8), fontWeight = FontWeight(700))
         OutlinedButton(onClick = { userVM.logout() }) {
             Text(text = "Logout")
         }
@@ -76,6 +77,7 @@ fun BottomBar(navController: NavHostController) {
             .padding(vertical = 10.dp)
     ) {
         Icon(
+            tint = Color(0xfff8e3d8),
             painter = painterResource(id = R.drawable.ic_chat),
             contentDescription = "chat",
             modifier = Modifier.clickable {
@@ -84,6 +86,7 @@ fun BottomBar(navController: NavHostController) {
                 )
             })
         Icon(
+            tint = Color(0xfff8e3d8),
             painter = painterResource(id = R.drawable.ic_bot),
             contentDescription = "bot",
             modifier = Modifier.clickable {
@@ -99,6 +102,6 @@ fun MainContent(navController: NavHostController) {
     NavHost(navController = navController, startDestination = CHAT_ROUTE) {
         composable(route = CHAT_ROUTE) { ChatView(navController) }
         composable(route = BOT_ROUTE) { ChatWithBotView(navController) }
-        composable(route= CHAT_CONVERSATION_ROUTE) { ConversationView()}
+        composable(route = CHAT_CONVERSATION_ROUTE) { ConversationView() }
     }
 }

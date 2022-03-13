@@ -18,30 +18,22 @@ class UserViewModel : ViewModel() {
     private var fStore = Firebase.firestore
 
     fun login(context: Context, email: String, password: String) {
-        Log.d("-------------", "login event")
         fAuth
             .signInWithEmailAndPassword(email, password)
             .addOnSuccessListener { authResult ->
-                Log.d("-------------", "firebase auth success")
-                Log.d("-------------", authResult.toString())
                 if (authResult.user != null) {
                     fStore
                         .collection("users")
                         .document(authResult.user!!.uid)
                         .get()
                         .addOnSuccessListener {
-                            Log.d("-------------", "success get document")
-                            Log.d("-------------", it.get("nickname").toString())
                             loggedInUser.value =
                                 User(authResult.user!!.uid, it.get("nickname").toString())
                         }
                 }
             }
             .addOnFailureListener {
-
                 showAlertDialog(context, "Wrong username or password.")
-                Log.d("-------------", "firebase auth failed")
-                Log.d("-------------", it.toString())
             }
 
     }
@@ -84,8 +76,6 @@ class UserViewModel : ViewModel() {
                     fAuth
                         .createUserWithEmailAndPassword(email, password)
                         .addOnSuccessListener {
-                            Log.d("-------------", "success register")
-                            Log.d("-------------", it.user?.uid.toString())
                             if (it.user != null) {
                                 fStore.collection("users").document(it.user!!.uid).set(
                                     mapOf("nickname" to nickname)
@@ -101,8 +91,6 @@ class UserViewModel : ViewModel() {
                             showAlertDialog(context, "Registration succeeded. You can login now.")
                         }
                         .addOnFailureListener {
-                            Log.d("-------------", "failure register")
-                            Log.d("-------------", it.toString())
                             var errorMessage = ""
                             try {
                                 errorMessage = it.toString().split(":")[1].trim()
@@ -125,9 +113,6 @@ class UserViewModel : ViewModel() {
             .collection("users")
             .get()
             .addOnSuccessListener { querySnapshot ->
-                val test = querySnapshot.map { it ->
-                    User(it.id, it.get("nickname").toString())
-                }
 
                 querySnapshot.forEach { queryDocumentSnapshot ->
                     val id = queryDocumentSnapshot.id
@@ -143,10 +128,9 @@ class UserViewModel : ViewModel() {
 
 
                 }
-                Log.d("-------------", "success get all docs")
             }
             .addOnFailureListener {
-                Log.d("-------------", "fail get all docs")
+                Log.e("-------------", "failed to get all documents")
             }
     }
 
