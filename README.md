@@ -10,6 +10,6 @@ Student's name: Thuc Nguyen
 - Clone this repository:
 ```git clone https://github.com/thuc-nguyen-oamk/MobileFinal -b master```
 - Open it in your Android Studio.
-- Connect the project with one of your firebase projects.
+- Connect the project with one of your firebase projects. Click here for more information: https://firebase.google.com/docs/android/setup
 - Use Android Studio to build and then run it.
 
