@@ -1,12 +1,15 @@
 # Mobile Programming Final Assignment
-## Student's name: Thuc Nguyen
+Student's name: Thuc Nguyen
 
-# How to use
-##  Use one of these methods:
+## How to use
+##### Use one of these methods:
 
-### 1. Download app-debug.apk in the repository base directory, install it into your android device/emulator, and run the application.
+##### 1. Download app-debug.apk in the repository base directory, install it into your android device/emulator, and run the application.
 
-### 2. Run it with Android Studio:
-#### 2.1. Clone this repository, open it in your Android Studio.
-#### 2.2. Connect the project with one of your firebase projects.
-#### 2.3. Use Android Studio to run it.
+##### 2. Clone and run with Android Studio:
+- Clone this repository:
+```git clone https://github.com/thuc-nguyen-oamk/MobileFinal -b master```
+- Open it in your Android Studio.
+- Connect the project with one of your firebase projects.
+- Use Android Studio to build and then run it.
+
