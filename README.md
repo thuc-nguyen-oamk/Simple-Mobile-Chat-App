@@ -5,5 +5,5 @@ Updated 2022 November: the bot provider has disabled free access, so the 'virtua
 
 ## How to use
 1. Download the file **app-debug.apk** in the repository's base directory
-2. Install it into your android device/ or an emulator
+2. Install it into your android device or an emulator
 3. Run the application.
